@@ -453,6 +453,9 @@ void AnycubicTFTClass::HandleSpecialMenu()
   } else if (strcmp(SelectedDirectory, "<filamentchange resume>")==0) {
     SERIAL_ECHOLNPGM("Special Menu: FilamentChange Resume");
     FilamentChangeResume();
+  } else if (strcmp(SelectedDirectory, "<auto bed leveling>")==0) {
+    SERIAL_ECHOLNPGM("Special Menu: Auto Bed Leveling");
+    enqueue_and_echo_commands_P(PSTR("G28\nG29"));
   } else if (strcmp(SelectedDirectory, "<exit>")==0) {
     SpecialMenu=false;
   }
@@ -461,7 +464,37 @@ void AnycubicTFTClass::HandleSpecialMenu()
 void AnycubicTFTClass::Ls()
 {
   if (SpecialMenu) {
-    switch (filenumber) {
+	   #if ENABLED(BLTOUCH)
+	  case 0: // First Page
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Preheat bed>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Preheat bed>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Auto Bed Leveling>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Auto Bed Leveling>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Save EEPROM>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Save EEPROM>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Exit>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Exit>");
+      break;
+
+      case 4: // Second Page
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Auto Tune Hotend PID>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Auto Tune Hotend PID>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Auto Tune Hotbed PID>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Auto Tune Hotbed PID>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Load FW Defaults>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Load FW Defaults>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<FilamentChange Pause>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<FilamentChange Pause>");
+      break;
+
+      case 8: // Third Page
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<FilamentChange Resume>");
+      ANYCUBIC_SERIAL_PROTOCOLLNPGM("<FilamentChange Resume>");
+      break;
+	  
+	  #endif // BLTOUCH
+	  #if DISABLED(BLTOUCH)
+	  switch (filenumber) {
       case 0: // First Page
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Z Up 0.1>");
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Z Up 0.1>");
@@ -480,6 +513,7 @@ void AnycubicTFTClass::Ls()
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Start Mesh Leveling>");
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Next Mesh Point>");
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Next Mesh Point>");
+	  
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Save EEPROM>");
       ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Save EEPROM>");
       break;
@@ -505,6 +539,7 @@ void AnycubicTFTClass::Ls()
       default:
       break;
     }
+	 #endif // NO BLTOUCH
   }
   #ifdef SDSUPPORT
     else if(card.isMounted())
